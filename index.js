@@ -5,22 +5,23 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const app = express();
 const router = require("./router");
-const mongoose = require("mongoose");
+const mongoose = require("mongoose", { useUnifiedTopology: true });
+const cors = require("cors");
 
-// DB Setup
-mongoose.connect("mongodb://localhost/auth", function(err) {
-  if (err) {
-    console.log("~~~ Can't connect to server. ~~~");
-  }
-});
+// DB Setup and fixing deprecation warnings
+mongoose.set("useNewUrlParser", true);
+mongoose.set("useFindAndModify", false);
+mongoose.set("useCreateIndex", true);
+mongoose.set("useUnifiedTopology", true);
+mongoose.connect("mongodb://localhost/auth", { useNewUrlParser: true });
 
-// App setup
+// App Setup
 app.use(morgan("combined"));
-// app.use(cors());
+app.use(cors());
 app.use(bodyParser.json({ type: "*/*" }));
 router(app);
 
-// Server setup
+// Server Setup
 const port = process.env.PORT || 3090;
 const server = http.createServer(app);
 server.listen(port);
